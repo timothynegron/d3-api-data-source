@@ -69,11 +69,11 @@ d3.json(apiUrl, function(error, data){
 
 
 ///////////////////////////////////////////////////////////////
-// Scaling
+// Scaling: Helps create responsive data visualizations
 ///////////////////////////////////////////////////////////////
 
-const height2 = 100;
-const width2 = 400;
+const height2 = 200;
+const width2 = 500;
 const apiUrl2 = "https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json"
 
 // ┌─────────────────────────┐
@@ -82,10 +82,23 @@ const apiUrl2 = "https://api.github.com/repos/bsullins/d3js-resources/contents/m
 
 function buildJSONLine2(ds){
 
+    // X axis domain and range
+    const xScale = d3.scale.linear()
+                    .domain([
+                        d3.min(ds.monthlySales, function(d){return d.month;}),
+                        d3.max(ds.monthlySales, function(d){return d.month;})
+                    ])
+                    .range([0, width2]);
+    
+    // Y axis domain and range
+    const yScale = d3.scale.linear()
+                    .domain([0, d3.max(ds.monthlySales, function(d){return d.sales;})])
+                    .range([height2, 0]);
+
     // Line function
     const lineFun = d3.svg.line()
-    .x(function(d){return (d.month-20130001)/3.25})
-    .y(function(d){return (height2-d.sales);})
+    .x(function(d){return xScale(d.month);})
+    .y(function(d){return yScale(d.sales);})
     .interpolate("linear");
 
     // Append svg to tag
