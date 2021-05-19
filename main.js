@@ -66,3 +66,73 @@ d3.json(apiUrl, function(error, data){
         buildJSONLine(ds);
     })
 });
+
+
+///////////////////////////////////////////////////////////////
+// Scaling
+///////////////////////////////////////////////////////////////
+
+const height2 = 100;
+const width2 = 400;
+const apiUrl2 = "https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json"
+
+// ┌─────────────────────────┐
+// │   Build Line Function   │	
+// └─────────────────────────┘
+
+function buildJSONLine2(ds){
+
+    // Line function
+    const lineFun = d3.svg.line()
+    .x(function(d){return (d.month-20130001)/3.25})
+    .y(function(d){return (height2-d.sales);})
+    .interpolate("linear");
+
+    // Append svg to tag
+    const svg = d3.select("#scaling")
+            .append("svg")
+            .attr({
+            width: width2,
+            height: height2
+    });
+
+    // Append visuals to svg
+    const viz = svg.append("path")
+                .attr({
+                d: lineFun(ds.monthlySales),
+                    "stroke": "purple",
+                    "stroke-width": 2,
+                    "fill": "none"
+                });
+}
+
+// ┌──────────────────────────┐
+// │   Show Header Function   │	
+// └──────────────────────────┘
+
+function showHeader2(ds) {
+    d3.select("#scaling").append("h1")
+                    .text(ds.category + " Sales (2013)");
+}
+
+// ┌───────────────────────────┐
+// │   Read Data then Append   │	
+// └───────────────────────────┘
+
+d3.json(apiUrl2, function(error, data){
+
+    if(error){
+        console.log(error);
+    }else{
+        console.log(data);
+    }
+
+    const decodedData = JSON.parse(window.atob(data.content));
+    console.log(decodedData.contents[0].monthlySales[0]);
+    console.log(decodedData.contents[1]);
+
+    decodedData.contents.forEach(function(ds){
+        showHeader2(ds);
+        buildJSONLine2(ds);
+    })
+});
