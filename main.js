@@ -75,6 +75,7 @@ d3.json(apiUrl, function(error, data){
 const height2 = 200;
 const width2 = 500;
 const apiUrl2 = "https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json"
+const padding = 50;
 
 // ┌─────────────────────────┐
 // │   Build Line Function   │	
@@ -88,12 +89,15 @@ function buildJSONLine2(ds){
                         d3.min(ds.monthlySales, function(d){return d.month;}),
                         d3.max(ds.monthlySales, function(d){return d.month;})
                     ])
-                    .range([0, width2]);
+                    .range([padding + 5, width2 - padding]);
     
     // Y axis domain and range
     const yScale = d3.scale.linear()
                     .domain([0, d3.max(ds.monthlySales, function(d){return d.sales;})])
-                    .range([height2, 0]);
+                    .range([height2 - padding, 10]);
+
+    const xAxisGen = d3.svg.axis().scale(xScale).orient("bottom");
+    const yAxisGen = d3.svg.axis().scale(yScale).orient("left").ticks(4);
 
     // Line function
     const lineFun = d3.svg.line()
@@ -108,6 +112,14 @@ function buildJSONLine2(ds){
             width: width2,
             height: height2
     });
+
+    const yAxis = svg.append("g").call(yAxisGen)
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + padding + ", 0)");
+
+    const xAxis =  svg.append("g").call(xAxisGen)
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (height2-padding) + ")");
 
     // Append visuals to svg
     const viz = svg.append("path")
