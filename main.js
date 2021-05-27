@@ -77,18 +77,34 @@ const width2 = 500;
 const apiUrl2 = "https://api.github.com/repos/bsullins/d3js-resources/contents/monthlySalesbyCategoryMultiple.json"
 const padding = 50;
 
+// ┌──────────────────────┐
+// │   getDate Function   │	
+// └──────────────────────┘
+
+function getDate(d){
+
+    //20130101
+    const strDate = new String(d);
+
+    const year = strDate.substr(0, 4);
+    const month = strDate.substr(4,2) - 1;
+    const day = strDate.substr(6,2);
+
+    return new Date(year, month, day);
+}
+
 // ┌─────────────────────────┐
 // │   Build Line Function   │	
 // └─────────────────────────┘
 
 function buildJSONLine2(ds){
 
+    const minDate = getDate(ds.monthlySales[0]['month']);
+    const maxDate = getDate(ds.monthlySales[ds.monthlySales.length - 1]['month']);
+
     // X axis domain and range
-    const xScale = d3.scale.linear()
-                    .domain([
-                        d3.min(ds.monthlySales, function(d){return d.month;}),
-                        d3.max(ds.monthlySales, function(d){return d.month;})
-                    ])
+    const xScale = d3.time.scale()
+                    .domain([minDate, maxDate])
                     .range([padding + 5, width2 - padding]);
     
     // Y axis domain and range
@@ -96,12 +112,12 @@ function buildJSONLine2(ds){
                     .domain([0, d3.max(ds.monthlySales, function(d){return d.sales;})])
                     .range([height2 - padding, 10]);
 
-    const xAxisGen = d3.svg.axis().scale(xScale).orient("bottom");
+    const xAxisGen = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(d3.time.format("%b"));
     const yAxisGen = d3.svg.axis().scale(yScale).orient("left").ticks(4);
 
     // Line function
     const lineFun = d3.svg.line()
-    .x(function(d){return xScale(d.month);})
+    .x(function(d){return xScale(getDate(d.month));})
     .y(function(d){return yScale(d.sales);})
     .interpolate("linear");
 
